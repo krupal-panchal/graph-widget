@@ -1,0 +1,19 @@
+/*!********************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./src/style/main.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************/
+.recharts-wrapper {
+  width: 100% !important;
+}
+
+.graph-top-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.graph-top-block .graph-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/*# sourceMappingURL=index.css.map*/

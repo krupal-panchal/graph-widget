@@ -1,0 +1,19 @@
+{
+  "name": "graph-widget",
+  "version": "1.0.0",
+  "description": "A Plugin that add graph widget in admin dashboard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start"
+  },
+  "author": "Krupal Panchal",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "^26.17.0"
+  },
+  "dependencies": {
+    "recharts": "^2.10.1"
+  }
+}
