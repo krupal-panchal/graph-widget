@@ -10,7 +10,7 @@ const GraphWidget = () => {
 	}
 
 	const optionsData = [
-		{ 'name' : '7 Days', 'value' : '7d' },
+		{ 'name' : 'Last 7 Days', 'value' : '7d' },
 		{ 'name' : '15 Days', 'value' : '15d' },
 		{ 'name' : '1 Month', 'value' : '1m' }
 	];
