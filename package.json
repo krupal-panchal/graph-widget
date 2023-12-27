@@ -11,9 +11,12 @@
   "author": "Krupal Panchal",
   "license": "ISC",
   "devDependencies": {
+    "@wordpress/babel-preset-default": "^7.32.0",
+    "@wordpress/i18n": "^4.48.0",
     "@wordpress/scripts": "^26.17.0"
   },
   "dependencies": {
+    "@wordpress/api-fetch": "^6.45.0",
     "recharts": "^2.10.1"
   }
 }

@@ -38,13 +38,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/chart/LineChart.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/CartesianGrid.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/XAxis.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/YAxis.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/component/Tooltip.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/component/Legend.js");
-/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/Line.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/chart/LineChart.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/CartesianGrid.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/XAxis.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/YAxis.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/component/Tooltip.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/component/Legend.js");
+/* harmony import */ var recharts__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! recharts */ "./node_modules/recharts/es6/cartesian/Line.js");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/url */ "@wordpress/url");
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_url__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
 
 
 
@@ -55,15 +64,53 @@ const GraphUI = props => {
   }, [props.duration]);
   const getGraphDataByAPI = () => {
     let option_name = 'graph_data';
-    let url = `http://localhost/php/wp/wpdemo/wp-json/get/options/?name=${option_name}&key=${props.duration}`;
-    fetch(url).then(response => response.json()).then(resp => {
-      setGraphData(resp);
-      console.log(resp);
-    }).catch(err => {
-      console.log(err);
+
+    /**
+     * Method to get the data of N days.
+     */
+    const getLastNDaysData = (dataArray, days) => {
+      // Parse date strings into Date objects
+      const parsedData = dataArray.map(item => ({
+        Date: new Date(item.Date),
+        Expense: item.Expense
+      }));
+
+      // Sort the array based on the Date in increasing order
+      const sortedData = parsedData.sort((a, b) => a.Date - b.Date);
+
+      // Get the start date for the range (N days ago from today)
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      // Filter data for the last N days
+      const lastNDaysData = sortedData.filter(item => item.Date >= startDate);
+
+      // Format dates to 'Y-m-d' and store in a new array
+      const formattedData = lastNDaysData.map(item => ({
+        Date: item.Date.toISOString().split('T')[0],
+        // 'Y-m-d' format
+        Expense: item.Expense
+      }));
+      return formattedData;
+    };
+
+    // Fetch the data from API.
+    const queryParams = {
+      name: option_name
+    };
+    _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_2___default()({
+      path: (0,_wordpress_url__WEBPACK_IMPORTED_MODULE_3__.addQueryArgs)('/get/options', queryParams)
+    }).then(resp => {
+      if ('7d' === props.duration) {
+        setGraphData(getLastNDaysData(resp, 7));
+      } else if ('15d' === props.duration) {
+        setGraphData(getLastNDaysData(resp, 15));
+      } else {
+        setGraphData(getLastNDaysData(resp, 30));
+      }
     });
   };
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_1__.LineChart, {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_4__.LineChart, {
     width: 400,
     height: 300,
     data: graphData,
@@ -73,13 +120,13 @@ const GraphUI = props => {
       left: 5,
       bottom: 5
     }
-  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_2__.CartesianGrid, {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_5__.CartesianGrid, {
     strokeDasharray: "3 3"
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_3__.XAxis, {
-    dataKey: "Month"
-  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_4__.YAxis, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_5__.Tooltip, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_6__.Legend, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_7__.Line, {
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_6__.XAxis, {
+    dataKey: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Date', 'graph-widget')
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_7__.YAxis, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_8__.Tooltip, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_9__.Legend, null), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(recharts__WEBPACK_IMPORTED_MODULE_10__.Line, {
     type: "monotone",
-    dataKey: "Expense",
+    dataKey: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Expense', 'graph-widget'),
     stroke: "#8884d8",
     activeDot: {
       r: 8
@@ -104,6 +151,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _GraphUI__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GraphUI */ "./src/components/GraphUI.jsx");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__);
+
 
 
 
@@ -112,21 +162,23 @@ const GraphWidget = () => {
   const handleExpenseDuration = event => {
     setExpenseDuration(event.target.value);
   };
+
+  // Dropdown options.
   const optionsData = [{
-    'name': '7 Days',
+    'name': (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Last 7 Days', 'graph-widget'),
     'value': '7d'
   }, {
-    'name': '15 Days',
+    'name': (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('15 Days', 'graph-widget'),
     'value': '15d'
   }, {
-    'name': '1 Month',
+    'name': (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('1 Month', 'graph-widget'),
     'value': '1m'
   }];
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "graph-top-block"
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
     className: "graph-title"
-  }, "Expense Data"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
+  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Expense Data', 'graph-widget')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("select", {
     name: "expense",
     id: "expenseDuration",
     value: expenseDuration,
@@ -14798,7 +14850,7 @@ var Bar = /*#__PURE__*/function (_PureComponent) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_7__.Layer, _extends({
           className: "recharts-bar-rectangle"
         }, (0,_util_types__WEBPACK_IMPORTED_MODULE_8__.adaptEventsOfChild)(_this2.props, entry, i), {
-          key: "rectangle-".concat(i) // eslint-disable-line react/no-array-index-key
+          key: "rectangle-".concat(entry === null || entry === void 0 ? void 0 : entry.x, "-").concat(entry === null || entry === void 0 ? void 0 : entry.y, "-").concat(entry === null || entry === void 0 ? void 0 : entry.value)
         }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_util_BarUtils__WEBPACK_IMPORTED_MODULE_9__.BarRectangle, props));
       });
     }
@@ -14939,10 +14991,9 @@ var Bar = /*#__PURE__*/function (_PureComponent) {
       var errorBarProps = {
         clipPath: needClip ? "url(#clipPath-".concat(clipPathId, ")") : null
       };
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_7__.Layer, errorBarProps, errorBarItems.map(function (item, i) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_7__.Layer, errorBarProps, errorBarItems.map(function (item) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().cloneElement(item, {
-          key: "error-bar-".concat(i),
-          // eslint-disable-line react/no-array-index-key
+          key: "error-bar-".concat(clipPathId, "-").concat(item.props.dataKey),
           data: data,
           xAxis: xAxis,
           yAxis: yAxis,
@@ -15534,7 +15585,11 @@ var Brush = /*#__PURE__*/function (_PureComponent) {
         y = _this$props8.y,
         travellerWidth = _this$props8.travellerWidth,
         height = _this$props8.height,
-        traveller = _this$props8.traveller;
+        traveller = _this$props8.traveller,
+        ariaLabel = _this$props8.ariaLabel,
+        data = _this$props8.data,
+        startIndex = _this$props8.startIndex,
+        endIndex = _this$props8.endIndex;
       var x = Math.max(travellerX, this.props.x);
       var travellerProps = _objectSpread(_objectSpread({}, (0,_util_ReactUtils__WEBPACK_IMPORTED_MODULE_6__.filterProps)(this.props)), {}, {
         x: x,
@@ -15542,9 +15597,12 @@ var Brush = /*#__PURE__*/function (_PureComponent) {
         width: travellerWidth,
         height: height
       });
+      var ariaLabelBrush = ariaLabel || "Min value: ".concat(data[startIndex].name, ", Max value: ").concat(data[endIndex].name);
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_7__.Layer, {
         tabIndex: 0,
         role: "slider",
+        "aria-label": ariaLabelBrush,
+        "aria-valuenow": travellerX,
         className: "recharts-brush-traveller",
         onMouseEnter: this.handleEnterSlideOrTraveller,
         onMouseLeave: this.handleLeaveSlideOrTraveller,
@@ -16091,7 +16149,7 @@ var CartesianAxis = /*#__PURE__*/function (_Component) {
         });
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_8__.Layer, _extends({
           className: "recharts-cartesian-axis-tick",
-          key: "tick-".concat(i) // eslint-disable-line react/no-array-index-key
+          key: "tick-".concat(entry.value, "-").concat(entry.coordinate, "-").concat(entry.tickCoord)
         }, (0,_util_types__WEBPACK_IMPORTED_MODULE_9__.adaptEventsOfChild)(_this2.props, entry, i)), tickLine && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", _extends({}, tickLineProps, lineCoord, {
           className: (0,clsx__WEBPACK_IMPORTED_MODULE_3__["default"])('recharts-cartesian-axis-tick-line', lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(tickLine, 'className'))
         })), tick && CartesianAxis.renderTickItem(tick, tickProps, "".concat(lodash_isFunction__WEBPACK_IMPORTED_MODULE_1___default()(tickFormatter) ? tickFormatter(entry.value, i) : entry.value).concat(unit || '')));
@@ -16568,7 +16626,7 @@ function ErrorBar(props) {
     yAxis = props.yAxis,
     others = _objectWithoutProperties(props, _excluded);
   var svgProps = (0,_util_ReactUtils__WEBPACK_IMPORTED_MODULE_1__.filterProps)(others);
-  var errorBars = data.map(function (entry, i) {
+  var errorBars = data.map(function (entry) {
     var _dataPointFormatter = dataPointFormatter(entry, dataKey),
       x = _dataPointFormatter.x,
       y = _dataPointFormatter.y,
@@ -16647,22 +16705,16 @@ function ErrorBar(props) {
         y2: _yMin
       });
     }
-    return (
-      /*#__PURE__*/
-      // eslint-disable-next-line react/no-array-index-key
-      react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_2__.Layer, _extends({
-        className: "recharts-errorBar",
-        key: "bar-".concat(i)
-      }, svgProps), lineCoordinates.map(function (coordinates, index) {
-        return (
-          /*#__PURE__*/
-          // eslint-disable-next-line react/no-array-index-key
-          react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", _extends({}, coordinates, {
-            key: "line-".concat(index)
-          }))
-        );
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_2__.Layer, _extends({
+      className: "recharts-errorBar",
+      key: "bar-".concat(lineCoordinates.map(function (c) {
+        return "".concat(c.x1, "-").concat(c.x2, "-").concat(c.y1, "-").concat(c.y2);
       }))
-    );
+    }, svgProps), lineCoordinates.map(function (coordinates) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", _extends({}, coordinates, {
+        key: "line-".concat(coordinates.x1, "-").concat(coordinates.x2, "-").concat(coordinates.y1, "-").concat(coordinates.y2)
+      }));
+    }));
   });
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_2__.Layer, {
     className: "recharts-errorBars"
@@ -16877,10 +16929,9 @@ var Line = /*#__PURE__*/function (_PureComponent) {
       var errorBarProps = {
         clipPath: needClip ? "url(#clipPath-".concat(clipPathId, ")") : null
       };
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_10__.Layer, errorBarProps, errorBarItems.map(function (item, i) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Layer__WEBPACK_IMPORTED_MODULE_10__.Layer, errorBarProps, errorBarItems.map(function (item) {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().cloneElement(item, {
-          // eslint-disable-next-line react/no-array-index-key
-          key: "bar-".concat(i),
+          key: "bar-".concat(item.props.dataKey),
           data: points,
           xAxis: xAxis,
           yAxis: yAxis,
@@ -18171,6 +18222,7 @@ var LineChart = (0,_generateCategoricalChart__WEBPACK_IMPORTED_MODULE_0__.genera
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createDefaultState: () => (/* binding */ createDefaultState),
 /* harmony export */   generateCategoricalChart: () => (/* binding */ generateCategoricalChart),
 /* harmony export */   getAxisMapByAxes: () => (/* binding */ getAxisMapByAxes)
 /* harmony export */ });
@@ -18745,12 +18797,22 @@ var tooltipTicksGenerator = function tooltipTicksGenerator(axisMap) {
  * @return {Object} Whole new state
  */
 var createDefaultState = function createDefaultState(props) {
-  var _brushItem$props, _brushItem$props2;
   var children = props.children,
     defaultShowTooltip = props.defaultShowTooltip;
   var brushItem = (0,_util_ReactUtils__WEBPACK_IMPORTED_MODULE_16__.findChildByType)(children, _cartesian_Brush__WEBPACK_IMPORTED_MODULE_17__.Brush);
-  var startIndex = brushItem && brushItem.props && brushItem.props.startIndex || 0;
-  var endIndex = (brushItem === null || brushItem === void 0 || (_brushItem$props = brushItem.props) === null || _brushItem$props === void 0 ? void 0 : _brushItem$props.endIndex) !== undefined ? brushItem === null || brushItem === void 0 || (_brushItem$props2 = brushItem.props) === null || _brushItem$props2 === void 0 ? void 0 : _brushItem$props2.endIndex : props.data && props.data.length - 1 || 0;
+  var startIndex = 0;
+  var endIndex = 0;
+  if (props.data && props.data.length !== 0) {
+    endIndex = props.data.length - 1;
+  }
+  if (brushItem && brushItem.props) {
+    if (brushItem.props.startIndex >= 0) {
+      startIndex = brushItem.props.startIndex;
+    }
+    if (brushItem.props.endIndex >= 0) {
+      endIndex = brushItem.props.endIndex;
+    }
+  }
   return {
     chartX: 0,
     chartY: 0,
@@ -19873,7 +19935,7 @@ var generateCategoricalChart = function generateCategoricalChart(_ref6) {
       key: "getTooltipEventType",
       value: function getTooltipEventType() {
         var tooltipItem = (0,_util_ReactUtils__WEBPACK_IMPORTED_MODULE_16__.findChildByType)(this.props.children, _component_Tooltip__WEBPACK_IMPORTED_MODULE_31__.Tooltip);
-        if (tooltipItem && Boolean(tooltipItem.props.shared)) {
+        if (tooltipItem && typeof tooltipItem.props.shared === 'boolean') {
           var eventType = tooltipItem.props.shared ? 'axis' : 'item';
           return validateTooltipEventTypes.indexOf(eventType) >= 0 ? eventType : defaultTooltipEventType;
         }
@@ -20486,8 +20548,10 @@ var DefaultLegendContent = /*#__PURE__*/function (_PureComponent) {
         var color = entry.inactive ? inactiveColor : entry.color;
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", _extends({
           className: className,
-          style: itemStyle,
-          key: "legend-item-".concat(i) // eslint-disable-line react/no-array-index-key
+          style: itemStyle
+          // eslint-disable-next-line react/no-array-index-key
+          ,
+          key: "legend-item-".concat(i)
         }, (0,_util_types__WEBPACK_IMPORTED_MODULE_5__.adaptEventsOfChild)(_this.props, entry, i)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_container_Surface__WEBPACK_IMPORTED_MODULE_6__.Surface, {
           width: iconSize,
           height: iconSize,
@@ -21788,15 +21852,12 @@ var Text = function Text(_ref5) {
     textAnchor: textAnchor,
     fill: fill.includes('url') ? DEFAULT_FILL : fill
   }), wordsByLines.map(function (line, index) {
-    return (
-      /*#__PURE__*/
-      // eslint-disable-next-line react/no-array-index-key
-      react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tspan", {
-        x: x,
-        dy: index === 0 ? startDy : lineHeight,
-        key: index
-      }, line.words.join(breakAll ? '' : ' '))
-    );
+    var words = line.words.join(breakAll ? '' : ' ');
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("tspan", {
+      x: x,
+      dy: index === 0 ? startDy : lineHeight,
+      key: words
+    }, words);
   }));
 };
 
@@ -23283,13 +23344,13 @@ function Shape(_ref2) {
  */
 
 function isFunnel(graphicalItem, _item) {
-  return 'trapezoids' in graphicalItem.props;
+  return _item != null && 'trapezoids' in graphicalItem.props;
 }
 function isPie(graphicalItem, _item) {
-  return 'sectors' in graphicalItem.props;
+  return _item != null && 'sectors' in graphicalItem.props;
 }
 function isScatter(graphicalItem, _item) {
-  return 'points' in graphicalItem.props;
+  return _item != null && 'points' in graphicalItem.props;
 }
 function compareFunnel(shapeData, activeTooltipItem) {
   var _activeTooltipItem$la, _activeTooltipItem$la2;
@@ -27195,6 +27256,17 @@ module.exports = window["ReactDOM"];
 
 /***/ }),
 
+/***/ "@wordpress/api-fetch":
+/*!**********************************!*\
+  !*** external ["wp","apiFetch"] ***!
+  \**********************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = window["wp"]["apiFetch"];
+
+/***/ }),
+
 /***/ "@wordpress/element":
 /*!*********************************!*\
   !*** external ["wp","element"] ***!
@@ -27203,6 +27275,28 @@ module.exports = window["ReactDOM"];
 
 "use strict";
 module.exports = window["wp"]["element"];
+
+/***/ }),
+
+/***/ "@wordpress/i18n":
+/*!******************************!*\
+  !*** external ["wp","i18n"] ***!
+  \******************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = window["wp"]["i18n"];
+
+/***/ }),
+
+/***/ "@wordpress/url":
+/*!*****************************!*\
+  !*** external ["wp","url"] ***!
+  \*****************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = window["wp"]["url"];
 
 /***/ }),
 

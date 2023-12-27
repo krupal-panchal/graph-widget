@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import GraphUI from './GraphUI';
+import { __ } from '@wordpress/i18n';
 
 const GraphWidget = () => {
 
@@ -9,16 +10,17 @@ const GraphWidget = () => {
 		setExpenseDuration(event.target.value);
 	}
 
+	// Dropdown options.
 	const optionsData = [
-		{ 'name' : 'Last 7 Days', 'value' : '7d' },
-		{ 'name' : '15 Days', 'value' : '15d' },
-		{ 'name' : '1 Month', 'value' : '1m' }
+		{ 'name' : __( 'Last 7 Days', 'graph-widget' ), 'value' : '7d' },
+		{ 'name' : __( '15 Days', 'graph-widget' ), 'value' : '15d' },
+		{ 'name' : __( '1 Month', 'graph-widget' ), 'value' : '1m' }
 	];
 
 	return (
 		<div>
 			<div className="graph-top-block">
-				<span className="graph-title">Expense Data</span>
+				<span className="graph-title">{__( 'Expense Data', 'graph-widget' )}</span>
 				<select name="expense" id="expenseDuration" value={expenseDuration} onChange={handleExpenseDuration}>
 					{
 						optionsData.map(
@@ -32,7 +34,7 @@ const GraphWidget = () => {
 			< hr />
 			<GraphUI duration={expenseDuration}/>
 		</div>
-	 );
+	);
 }
 
 export default GraphWidget;

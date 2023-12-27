@@ -4,8 +4,12 @@
  *
  * @author Krupal Panchal
  */
-
 class Graph_Widget_Admin {
+
+	/**
+	 * @var string Permission option.
+	 */
+	public const PERMISSION = 'manage_options';
 
 	/**
 	 * Class constructor.
@@ -26,11 +30,16 @@ class Graph_Widget_Admin {
 	 */
 	public function add_widget_in_dashboard() : void {
 
-		wp_add_dashboard_widget(
-			'graph_widget',
-			'Graph Widget',
-			[ $this, 'widget_elements' ]
-		);
+		// Only show widget to Admins.
+		if ( current_user_can( static::PERMISSION ) ) {
+
+			wp_add_dashboard_widget(
+				'graph_widget',
+				__( 'Graph Widget', 'graph-widget' ),
+				[ $this, 'widget_elements' ]
+			);
+
+		}
 	}
 
 	/**
@@ -45,24 +54,29 @@ class Graph_Widget_Admin {
 	/**
 	 * Method to enqueue admin scripts and styles.
 	 *
+	 * @param string $hook_suffix The current admin page.
+	 *
 	 * @return void
 	 */
-	public function admin_enqueue_scripts() : void {
+	public function admin_enqueue_scripts( string $hook_suffix ) : void {
 
-		wp_enqueue_style(
-			'gw-style',
-			GRAPH_WIDGET_ROOT . 'build/index.css',
-			[],
-			GRAPH_WIDGET_VERSION,
-			'all'
-		);
+		// Enqueue style and script only on dashboard.
+		if ( 'index.php' === $hook_suffix ) {
+			wp_enqueue_style(
+				'gw-style',
+				GRAPH_WIDGET_ROOT . 'build/index.css',
+				[],
+				GRAPH_WIDGET_VERSION,
+				'all'
+			);
 
-		wp_enqueue_script(
-			'gw-script',
-			GRAPH_WIDGET_ROOT . 'build/index.js',
-			array( 'wp-element' ),
-			GRAPH_WIDGET_VERSION,
-			true
-		);
+			wp_enqueue_script(
+				'gw-script',
+				GRAPH_WIDGET_ROOT . 'build/index.js',
+				[ 'wp-api-fetch', 'wp-element', 'wp-components', 'wp-i18n' ],
+				GRAPH_WIDGET_VERSION,
+				true
+			);
+		}
 	}
 }

@@ -1,0 +1,14 @@
+.recharts-wrapper {
+  width: 100% !important;
+}
+
+.graph-top-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.graph-top-block .graph-title {
+  font-size: 18px;
+  font-weight: 500;
+}/*# sourceMappingURL=main.css.map */

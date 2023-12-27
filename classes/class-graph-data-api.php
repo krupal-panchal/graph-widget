@@ -4,35 +4,7 @@
  *
  * @author Krupal Panchal
  */
-
 class Graph_Data_API {
-
-	/**
-	 * @var array Graph data that we need for widget.
-	 */
-	public const GRAPH_DATA = [
-		'7d'  => [
-			['Month' => 'Jan', 'Expense' => '1100'],
-			['Month' => 'Feb', 'Expense' => '2500'],
-			['Month' => 'Mar', 'Expense' => '2100'],
-			['Month' => 'Apr', 'Expense' => '1200'],
-			['Month' => 'May', 'Expense' => '3000'],
-		],
-		'15d' => [
-			['Month' => 'Jan', 'Expense' => '2500'],
-			['Month' => 'Feb', 'Expense' => '1900'],
-			['Month' => 'Mar', 'Expense' => '2200'],
-			['Month' => 'Apr', 'Expense' => '1500'],
-			['Month' => 'May', 'Expense' => '3000'],
-		],
-		'1m'  => [
-			['Month' => 'Jan', 'Expense' => '4500'],
-			['Month' => 'Feb', 'Expense' => '2500'],
-			['Month' => 'Mar', 'Expense' => '2000'],
-			['Month' => 'Apr', 'Expense' => '1800'],
-			['Month' => 'May', 'Expense' => '2500'],
-		],
-	];
 
 	/**
 	 * Class constructor.
@@ -43,14 +15,6 @@ class Graph_Data_API {
 		 * Actions
 		 */
 		add_action( 'rest_api_init', [ $this, 'register_options_route' ] );
-
-		/*
-		 * If you want to update the GRAPH_DATA value. Just uncheck the below hook and refresh in admin.
-		 * It will update the value in option.
-		 *
-		 * FOR NOW THIS KEPT AS COMMENTED, BECAUSE THE VALUE DOES NOT NEED TO UPDATE EVERYTIME ADMIN INITIALIZE.
-		 */
-		// add_action( 'admin_init', [ $this, 'add_graph_data_option_value' ] );
 	}
 
 	/**
@@ -61,11 +25,12 @@ class Graph_Data_API {
 	public function register_options_route() : void {
 
 		register_rest_route(
-			'/get',
+			'get',
 			'options',
 			[
-				'methods'  => 'GET',
-				'callback' => [ $this, 'get_options_value' ],
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'get_options_value' ],
+				'permission_callback' => [ $this, 'get_permission_callback' ],
 			]
 		);
 	}
@@ -94,17 +59,13 @@ class Graph_Data_API {
 	}
 
 	/**
-	 * Method to add graph data in options.
+	 * Method to get permission for REST Route.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public function add_graph_data_option_value() {
+	public function get_permission_callback() : bool {
 
-		// Add or update the value in option.
-		update_option(
-			'graph_data',
-			static::GRAPH_DATA
-		);
+		// Returns true if the Admin user.
+		return current_user_can( Graph_Widget_Admin::PERMISSION );
 	}
-
 }
